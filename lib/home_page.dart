@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
       ),
       body:Center(
         child:Container(
-        child: Text('WELCOME'),
+        child: Text('WELCOME  TO HOME'),
       ),
       ),),
     );
