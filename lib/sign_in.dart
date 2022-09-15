@@ -13,11 +13,13 @@ class signin extends StatefulWidget {
 }
 
 class _signinState extends State<signin> {
-  final TextEditingController emailcontroler = TextEditingController();
-  final TextEditingController passwordcontroler = TextEditingController();
-  late bool _sucess;
-  late String _userEmail;
-
+  final TextEditingController phonecontroler = TextEditingController();
+  final TextEditingController otpcontroler = TextEditingController();
+  String verificationIdReceived="";
+  bool otpVisible=false;
+  /*late bool _sucess;
+  late String _userEmail;*/
+/*
     void _register() async {
     final User? user = (
         await _auth.signInWithEmailAndPassword(email: emailcontroler.text, password: passwordcontroler.text)
@@ -37,7 +39,7 @@ class _signinState extends State<signin> {
         _sucess = false;
       });
     }
-  }
+  }*/
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -62,11 +64,11 @@ class _signinState extends State<signin> {
           Expanded(
           child:Padding(padding: EdgeInsets.all(5),
           child: TextField(
-            controller: emailcontroler,
+            controller: phonecontroler,
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
-              hintText: 'Email',
+              hintText: 'phone',
               fillColor: Colors.white,
               filled: true,
             ),
@@ -75,25 +77,27 @@ class _signinState extends State<signin> {
 
     Expanded(
         child:Padding(padding: EdgeInsets.all(5),
+          child: Visibility(
+            visible: false,
         child: TextField(
-          controller: passwordcontroler,
+          controller: otpcontroler,
              keyboardType: TextInputType.text,
               decoration: InputDecoration(
                border: OutlineInputBorder(),
-               hintText: 'Password',
+               hintText: 'otp code',
                 fillColor: Colors.white,
              filled: true,
            ) ,
-        ),),
+        ),),),
      ) ,
                 Expanded(
                   child:Padding(padding: EdgeInsets.all(10.0),
                       child: TextButton(style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all(Colors.white),
                       ), onPressed: (){
-                        _register();
+                        verifynumber();
                       },
-                          child: Text('LOGIN',))),),
+                          child: Text(otpVisible? "LOGIN" : "verify",))),),
 
        ],
             ),
@@ -102,6 +106,27 @@ class _signinState extends State<signin> {
       ),
 
     );
+  }
+  void verifynumber(){
+    _auth.verifyPhoneNumber(phoneNumber: phonecontroler.text,
+        verificationCompleted: (PhoneAuthCredential credential){
+          _auth.signInWithCredential(credential).then((value){
+            print("you are logged in successfully");
+          });
+        },
+        verificationFailed: (FirebaseAuthException exception){
+          print(exception.message);
+        },
+        codeSent: (String verificationId,int? resendToken){
+          verificationIdReceived = verificationId;
+          otpVisible=true;
+          setState(() {
+
+          });
+        },
+        codeAutoRetrievalTimeout: (String verificationId){
+
+        });
   }
 }
 
